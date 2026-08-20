@@ -1,0 +1,21 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "pnpm run build",
+  "outputDirectory": ".next",
+  "installCommand": "pnpm install --no-frozen-lockfile",
+  "devCommand": "pnpm run dev",
+  "regions": [
+    "iad1"
+  ],
+  "build": {
+    "env": {
+      "SKIP_ENV_VALIDATION": "true",
+      "NEXT_PUBLIC_ACCOUNT_ID": "137"
+    }
+  },
+  "functions": {
+    "src/app/api/**": {
+      "maxDuration": 30
+    }
+  }
+}

@@ -1,0 +1,28 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+## Explanation Style Rules
+
+When explaining technical concepts, always:
+
+1. Start with the absolute basics, assuming minimal prior knowledge
+2. Use real-world analogies and simple comparisons
+3. Break down complex topics into digestible chunks
+4. Provide concrete examples with before/after comparisons
+5. Explain the "why" before the "how"
+6. Use visual language and metaphors
+7. Include common mistakes and how to avoid them
+8. End with practical takeaways
+
+Example structure:
+1. What is it? (Basic definition)
+2. Why does it matter? (Real-world impact)
+3. How does it work? (Simple explanation)
+4. What does it look like? (Code examples)
+5. What are the benefits? (Practical advantages)
+6. What to watch out for? (Common pitfalls)
+7. When to use it? (Practical applications)
+
+Always use analogies that relate to everyday experiences (cooking, shopping, driving, etc.) to make technical concepts more relatable.
