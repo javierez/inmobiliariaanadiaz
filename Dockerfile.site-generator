@@ -1,0 +1,46 @@
+FROM node:20-slim
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    curl \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install GitHub CLI
+RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+    && apt-get update && apt-get install -y gh \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install pnpm
+RUN corepack enable && corepack prepare pnpm@10.2.0 --activate
+
+# Install Vercel CLI globally
+RUN npm install -g vercel
+
+# Configure git identity and GitHub auth for commits/pushes
+RUN git config --global user.email "bot@vesta.es" \
+    && git config --global user.name "Vesta Site Generator" \
+    && git config --global credential.helper store
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files first for caching
+COPY package.json pnpm-lock.yaml ./
+
+# Install dependencies (includes express via devDependencies + dependencies)
+RUN pnpm install --frozen-lockfile
+
+# Copy the rest of the project
+COPY . .
+
+# Create generated-sites directory
+RUN mkdir -p /root/generated-sites
+
+# Expose port
+EXPOSE 3001
+
+# Start the API server
+CMD ["pnpm", "tsx", "scripts/generate-site/server.ts"]
