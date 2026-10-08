@@ -512,12 +512,12 @@ export const searchListings = cache(
           listingType: listings.listingType,
           status: listings.status,
           // Derived "Reservado": an on-market listing that already has a live
-          // (non-Lost) deal. Not stored on the listing — computed from `deals`.
+          // reservation (Arras Pending / UnderContract). A Closed deal is history.
           reservado: sql<boolean>`(
             ${listings.status} IN ('En Venta', 'En Alquiler')
             AND EXISTS (
               SELECT 1 FROM deals d
-              WHERE d.listing_id = ${listings.listingId} AND d.stage <> 'Lost'
+              WHERE d.listing_id = ${listings.listingId} AND d.stage IN ('Arras Pending', 'UnderContract')
             )
           )`,
           isBankOwned: listings.isBankOwned,
@@ -698,12 +698,12 @@ export const getListingsForGrid = cache(
           listingType: listings.listingType,
           status: listings.status,
           // Derived "Reservado": an on-market listing that already has a live
-          // (non-Lost) deal. Not stored on the listing — computed from `deals`.
+          // reservation (Arras Pending / UnderContract). A Closed deal is history.
           reservado: sql<boolean>`(
             ${listings.status} IN ('En Venta', 'En Alquiler')
             AND EXISTS (
               SELECT 1 FROM deals d
-              WHERE d.listing_id = ${listings.listingId} AND d.stage <> 'Lost'
+              WHERE d.listing_id = ${listings.listingId} AND d.stage IN ('Arras Pending', 'UnderContract')
             )
           )`,
           isBankOwned: listings.isBankOwned,
@@ -892,12 +892,12 @@ export const getListingDetails = cache(
           price: listings.price,
           status: listings.status,
           // Derived "Reservado": an on-market listing that already has a live
-          // (non-Lost) deal. Not stored on the listing — computed from `deals`.
+          // reservation (Arras Pending / UnderContract). A Closed deal is history.
           reservado: sql<boolean>`(
             ${listings.status} IN ('En Venta', 'En Alquiler')
             AND EXISTS (
               SELECT 1 FROM deals d
-              WHERE d.listing_id = ${listings.listingId} AND d.stage <> 'Lost'
+              WHERE d.listing_id = ${listings.listingId} AND d.stage IN ('Arras Pending', 'UnderContract')
             )
           )`,
           isFurnished: listings.isFurnished,
