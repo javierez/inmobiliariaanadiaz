@@ -1,0 +1,104 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Addition Process  - Cursor Rule
+
+## Overview
+This rule outlines the complete process for adding new UI features to the application, ensuring consistency across UI, database, and data handling.
+
+## 1. Database Setup
+1. **Schema Updates** (Only if explicitly requested)
+   - Add new columns to existing tables
+   - Update column types if needed
+   - Add new indexes if required
+   - Document any schema changes
+
+## 2. Database Queries
+1. **Query Implementation**
+   - Create new query files in `lib/db/queries/`
+   - Use TypeScript for type safety
+   - Include proper error handling
+   - Add input validation
+   - Document query parameters and return types
+
+2. **Query Files Structure**
+   - Create separate query files for each data type:
+     - `social.ts` for social_links
+     - `seo.ts` for seo_props
+     - `hero.ts` for hero_props
+     - `featured.ts` for featured_props
+     - `about.ts` for about_props
+     - `properties.ts` for properties_props
+     - `testimonial.ts` for testimonial_props
+     - `footer.ts` for footer_props
+
+## 3. UI Components
+1. **Component Structure**
+   - Adapt the components based on the new queried data (see data structure in [data.ts](mdc:src/lib/data.ts) and [schema.ts](mdc:src/server/db/schema.ts)):
+     - `app/components/` for page-specific components
+   - Use TypeScript (.tsx) for all components
+
+2. **Component Implementation**
+   - Create component file with proper naming (PascalCase)
+   - Define TypeScript interfaces for props
+   - Implement error boundaries where needed
+   - Add loading states
+   - Include proper error handling
+
+## 4. Mock Data Creation
+1. **Data Structure**
+   - Define TypeScript interfaces for each data type
+   - Create mock data in `lib/data.ts`
+   - Ensure data matches the schema structure
+   - Include all required fields
+
+
+## 5. Testing
+1. **Component Testing**
+   - Test data retrieval functions
+   - Verify component rendering with mock data
+   - Test error handling
+   - Test loading states
+   - Test fallback values
+
+2. **Integration Testing**
+   - Test component integration
+   - Verify data flow
+   - Test error scenarios
+   - Test loading states
+
+## 6. Review Checklist
+- [ ] Database schema is properly designed
+- [ ] Migrations are tested
+- [ ] Queries are optimized and tested
+- [ ] Components are responsive
+- [ ] Error handling is implemented
+- [ ] Loading states are added
+- [ ] Types are properly defined
+- [ ] Documentation is updated
+- [ ] Tests are written and passing
+- [ ] Code follows style guide
+
+## Current Progress
+- [x] Created hero_props data structure and mock data
+- [x] Implemented hero.ts query file
+- [x] Updated hero.tsx component to use new data
+- [ ] Need to implement remaining query files:
+  - [ ] social.ts
+  - [ ] seo.ts
+  - [ ] featured.ts
+  - [ ] about.ts
+  - [ ] properties.ts
+  - [ ] testimonial.ts
+  - [ ] footer.ts
+
+## Next Steps
+1. Create remaining query files in `lib/db/queries/`
+2. Update corresponding components to use new data
+3. Test all components with mock data
+4. Implement error handling and loading states
+5. Update documentation
+
+
