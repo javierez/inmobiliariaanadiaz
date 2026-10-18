@@ -16,6 +16,7 @@ import { CheckCircle2, AlertCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { submitContactForm } from "~/server/actions/contact-form";
 import type { ContactFormData } from "~/server/actions/contact-form";
+import { PrivacyNotice } from "~/components/privacy-notice";
 
 export function ContactForm() {
   const [formState, setFormState] = useState({
@@ -231,6 +232,7 @@ export function ContactForm() {
             <Button type="submit" className="w-full" disabled={isSubmitting}>
               {isSubmitting ? "Enviando..." : "Enviar Mensaje"}
             </Button>
+            <PrivacyNotice />
           </form>
         )}
       </CardContent>

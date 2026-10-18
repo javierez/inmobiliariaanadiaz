@@ -1,6 +1,7 @@
 "use client";
 
 import { Video, Play, Globe } from "lucide-react";
+import { YouTubeEmbed } from "~/components/ui/youtube-embed";
 
 interface MediaItem {
   id: string;
@@ -103,18 +104,12 @@ export function PropertyMedia({
             const videoId = extractYouTubeId(yt.url);
             if (!videoId) return null;
             return (
-              <div
+              <YouTubeEmbed
                 key={yt.id}
-                className="aspect-video w-full overflow-hidden rounded-lg"
-              >
-                <iframe
-                  src={`https://www.youtube.com/embed/${videoId}`}
-                  title="YouTube video"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  className="h-full w-full"
-                />
-              </div>
+                videoId={videoId}
+                title="YouTube video"
+                className="rounded-lg"
+              />
             );
           })}
         </MediaSection>

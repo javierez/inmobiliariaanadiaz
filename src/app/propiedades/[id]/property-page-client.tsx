@@ -6,6 +6,7 @@ import { ShareButton } from "~/components/property/share-button";
 import { submitPropertyInquiry } from "~/server/actions/property-inquiry";
 import type { PropertyInquiryData } from "~/server/actions/property-inquiry";
 import { CheckCircle2, AlertCircle, X, Phone, Mail } from "lucide-react";
+import { PrivacyNotice } from "~/components/privacy-notice";
 
 interface PropertyPageClientProps {
   property: any;
@@ -278,6 +279,7 @@ export function PropertyPageClient({
               <Button type="submit" className="w-full" disabled={isSubmitting}>
                 {isSubmitting ? "Enviando..." : "Enviar Consulta"}
               </Button>
+              <PrivacyNotice />
             </form>
           )}
         </div>
