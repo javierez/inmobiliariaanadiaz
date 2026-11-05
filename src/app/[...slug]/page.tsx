@@ -4,6 +4,7 @@ import {
   searchListings,
   countListings,
   findListingByExactReference,
+  getListingDetails,
   type SearchFilters,
   type SortOption,
 } from "~/server/queries/listings";
@@ -37,6 +38,8 @@ import FaqJsonLd from "~/components/city/faq-json-ld";
 import { getCityContent } from "~/server/queries/city-content";
 import { isAccount137 } from "~/lib/account-overrides/137";
 import { stripReferencePrefix } from "~/lib/text-normalize";
+import { buildPropertySlug } from "~/lib/property-slug";
+import { toPublicDetailLocation } from "~/lib/location-privacy";
 
 const ITEMS_PER_PAGE = 24;
 const MAP_VIEW_LIMIT = 500;
@@ -227,10 +230,27 @@ export default async function SearchPage({
   const referenceQuery = stripReferencePrefix(query);
   if (referenceQuery && !/\s/.test(referenceQuery)) {
     const listingId = await findListingByExactReference(referenceQuery);
-    // Redirect to the bare id — the detail page already 301s that to its
-    // canonical slug (see propiedades/[id]/page.tsx), so there's no point
-    // rebuilding a partial slug here that would only get rewritten again.
-    if (listingId) redirect(`/propiedades/${listingId}`);
+    // Redirect straight to the canonical slug, built exactly as the detail
+    // page builds it (propiedades/[id]/page.tsx). Sending the bare id made the
+    // detail page redirect again, and two redirects in a row during a
+    // client-side navigation crash the App Router ("Application error" until
+    // the visitor reloads).
+    if (listingId) {
+      const details = await getListingDetails(Number(listingId));
+      const property = details ? toPublicDetailLocation(details) : null;
+      const target = property
+        ? buildPropertySlug({
+            listingId: property.listingId,
+            title: property.title,
+            propertyType: property.propertyType,
+            propertySubtype: property.propertySubtype,
+            city: property.city,
+            bedrooms: property.bedrooms,
+            listingType: property.listingType,
+          })
+        : listingId;
+      redirect(`/propiedades/${target}`);
+    }
   }
 
   // Parse the slug to get search parameters
