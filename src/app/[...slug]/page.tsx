@@ -3,8 +3,6 @@ import Link from "next/link";
 import {
   searchListings,
   countListings,
-  findListingByExactReference,
-  getListingDetails,
   type SearchFilters,
   type SortOption,
 } from "~/server/queries/listings";
@@ -27,6 +25,7 @@ import { SortDropdown } from "~/components/sort-dropdown";
 import { Pagination } from "~/components/pagination";
 import { Suspense } from "react";
 import { notFound, redirect } from "next/navigation";
+import { getReferenceTargetPath } from "~/server/queries/reference-target";
 import BreadcrumbJsonLd from "~/components/breadcrumb-json-ld";
 import { FeedViewToggle } from "~/components/propiedades/FeedViewToggle";
 import { PropertyFeed } from "~/components/propiedades/PropertyFeed";
@@ -37,9 +36,6 @@ import { CityFaq } from "~/components/city/city-faq";
 import FaqJsonLd from "~/components/city/faq-json-ld";
 import { getCityContent } from "~/server/queries/city-content";
 import { isAccount137 } from "~/lib/account-overrides/137";
-import { stripReferencePrefix } from "~/lib/text-normalize";
-import { buildPropertySlug } from "~/lib/property-slug";
-import { toPublicDetailLocation } from "~/lib/location-privacy";
 
 const ITEMS_PER_PAGE = 24;
 const MAP_VIEW_LIMIT = 500;
@@ -223,35 +219,12 @@ export default async function SearchPage({
   const isMapView = unwrappedSearchParams.vista === "mapa";
   const query = unwrappedSearchParams.q?.trim() ?? "";
 
-  // A whitespace-free query might be a reference someone pasted off a card
-  // ("Ref. PA-1023"). If it resolves to exactly one listing, go straight there
-  // — this is what the old "Busca por referencia" box did, and losing it would
-  // be a regression. Ambiguous or non-matching input falls through to results.
-  const referenceQuery = stripReferencePrefix(query);
-  if (referenceQuery && !/\s/.test(referenceQuery)) {
-    const listingId = await findListingByExactReference(referenceQuery);
-    // Redirect straight to the canonical slug, built exactly as the detail
-    // page builds it (propiedades/[id]/page.tsx). Sending the bare id made the
-    // detail page redirect again, and two redirects in a row during a
-    // client-side navigation crash the App Router ("Application error" until
-    // the visitor reloads).
-    if (listingId) {
-      const details = await getListingDetails(Number(listingId));
-      const property = details ? toPublicDetailLocation(details) : null;
-      const target = property
-        ? buildPropertySlug({
-            listingId: property.listingId,
-            title: property.title,
-            propertyType: property.propertyType,
-            propertySubtype: property.propertySubtype,
-            city: property.city,
-            bedrooms: property.bedrooms,
-            listingType: property.listingType,
-          })
-        : listingId;
-      redirect(`/propiedades/${target}`);
-    }
-  }
+  // Entrada directa por URL (enlace compartido, recarga): una referencia que
+  // resuelve a un único inmueble lleva a su ficha. El buscador del navbar ya
+  // la resuelve antes de navegar (resolveReferencePath), porque este redirect()
+  // durante una navegación del lado del cliente rompe el App Router.
+  const referenceTarget = await getReferenceTargetPath(query);
+  if (referenceTarget) redirect(referenceTarget);
 
   // Parse the slug to get search parameters
   const parsedParams = parseSearchSlug(slugString);

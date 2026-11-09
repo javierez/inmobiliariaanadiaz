@@ -17,6 +17,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { useRouter, usePathname } from "next/navigation";
+import { resolveReferencePath } from "~/server/actions/reference-search";
 import { Fragment, useState, useCallback, memo, useEffect } from "react";
 import { cn, hexToRgba } from "~/lib/utils";
 import { applyNavOrder } from "~/lib/nav-order";
@@ -201,10 +202,18 @@ export default function Navbar({
       e.preventDefault();
       const trimmed = searchQuery.trim();
       if (trimmed) {
-        // "todo" = every listing type, so a reference finds sales AND rentals.
-        // The results page short-circuits to the property detail page when the
-        // query resolves to exactly one listing by reference.
-        router.push(`/todo/todas-ubicaciones?q=${encodeURIComponent(trimmed)}`);
+        // Una referencia de un único inmueble va directa a su ficha. Se resuelve
+        // aquí y no con el redirect() de la página de resultados: ese redirect,
+        // durante una navegación del lado del cliente, rompe el App Router
+        // ("Application error" hasta recargar). "todo" = venta y alquiler.
+        void resolveReferencePath(trimmed)
+          .catch(() => null)
+          .then((target) =>
+            router.push(
+              target ??
+                `/todo/todas-ubicaciones?q=${encodeURIComponent(trimmed)}`,
+            ),
+          );
         setSearchQuery("");
         setIsMenuOpen(false);
         // En el móvil, cierra el teclado para que se vean los resultados.
